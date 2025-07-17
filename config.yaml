@@ -1,0 +1,9 @@
+app_settings:
+  environment: dev
+  project_name: "FastAPI Project Template"
+  api_prefix: "/api"
+  host: "127.0.0.1"
+  port: 8000
+  tea_token_url: "https://example.com/token"
+  region: "us-east-1"
+

@@ -1,0 +1,108 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# mypy
+.mypy_cache/
+.dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# VS Code
+.vscode/
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Poetry
+poetry.lock
+
+# Mac
+.DS_Store
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# Logs
+*.log
+
+# Local .env files
+.env.*
+
+# FastAPI static files
+static/
+
+# Alembic
+alembic/versions/
+
+# Misc
+*.sqlite3
+*.db
+
+
+/.idea/.gitignore
+/.idea/Core-Utilities.iml
+/.idea/inspectionProfiles/Project_Default.xml
+/.idea/inspectionProfiles/profiles_settings.xml
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/vcs.xml
+/src/api/.idea/.gitignore
+/src/api/.idea/api.iml
+/src/api/.idea/inspectionProfiles/Project_Default.xml
+/src/api/.idea/inspectionProfiles/profiles_settings.xml
+/src/api/.idea/misc.xml
+/src/api/.idea/modules.xml
+/src/api/.idea/vcs.xml
