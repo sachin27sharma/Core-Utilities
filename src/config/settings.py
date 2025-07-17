@@ -4,6 +4,7 @@ from functools import lru_cache
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from src.config.log_settings import LogSettings
 from src.config.redis_settings import RedisSettings
 from src.config.tea_token_settings import TeaTokenSettings
 
@@ -34,6 +35,7 @@ class AppSettings(BaseModel):
 class Settings(BaseSettings):
     redis: RedisSettings
     app: AppSettings
+    log_settings: LogSettings
     tea_credentials: TeaTokenSettings
     # Store any additional config properties
     extra_config: dict = {}
@@ -52,6 +54,7 @@ class Settings(BaseSettings):
             data = yaml.safe_load(f)
 
         app_data = data.get('app_settings', {})
+        log_data = data.get('log_settings', {})
         redis = RedisSettings()
         tea_credentials = TeaTokenSettings()
 
@@ -68,6 +71,7 @@ class Settings(BaseSettings):
             redis=redis,
             tea_credentials=tea_credentials,
             app=AppSettings(**app_data),
+            log_settings=LogSettings(**log_data),
             extra_config=extra_config
         )
 

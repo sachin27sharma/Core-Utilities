@@ -1,26 +1,36 @@
+import sys
 from loguru import logger
 from typing import Optional
+from src.config.log_settings import LogSettings
 
 class BaseLogger:
-    def __init__(self, config: Optional[dict] = None):
-        self.logger = logger
-        if config:
-            self.configure(config)
-
-    def configure(self, config: dict):
-        # Remove default handlers
-        self.logger.remove()
-        # Add new handler from config
-        self.logger.add(
-            config.get("sink", "sys.stderr"),
-            level=config.get("level", "INFO"),
-            format=config.get("format", "<green>{time}</green> <level>{message}</level>"),
-            rotation=config.get("rotation", None),
-            retention=config.get("retention", None),
-            compression=config.get("compression", None),
-            enqueue=config.get("enqueue", False),
+    @staticmethod
+    def configure(settings: LogSettings):
+        logger.remove()
+        # Console handler
+        logger.add(
+            sys.stdout,
+            format=settings.format,
+            level=settings.level,
+            enqueue=settings.enqueue,
+            backtrace=settings.backtrace,
+            diagnose=settings.diagnose,
+            serialize=settings.serialize,
+            colorize=settings.colorize,
         )
-
-    def get_logger(self):
-        return self.logger
+        # Optional: File handler with dynamic app name
+        log_file_path = f"logs/{settings.app_name}.log"
+        logger.add(
+            log_file_path,
+            rotation=settings.rotation,
+            retention=settings.retention,
+            level="DEBUG",
+            format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {name}:{function}:{line} - {message}",
+            compression=settings.compression,
+            enqueue=settings.enqueue,
+            backtrace=settings.backtrace,
+            diagnose=settings.diagnose,
+            serialize=settings.serialize,
+            colorize=settings.colorize,
+        )
 

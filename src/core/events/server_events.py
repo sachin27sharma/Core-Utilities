@@ -1,7 +1,7 @@
 # src/core/events/server_events.py
 
 from fastapi import FastAPI
-from src.core.logger import logger
+from loguru import logger
 
 
 def execute_backend_server_event_handler(backend_app: FastAPI):

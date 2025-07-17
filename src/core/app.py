@@ -4,6 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.config.settings import Settings
 from src.core.events.server_events import execute_backend_server_event_handler, terminate_backend_server_event_handler
 from src.middleware.list_middleware import MiddlewareList
+from src.middleware.exception_middleware import ExceptionHandlerMiddleware
+from src.logger.base_logger import BaseLogger
 
 
 class BaseApp:
@@ -26,6 +28,14 @@ class BaseApp:
         from src.api.base import router as base_router
         app = FastAPI(**self.settings.get_fastapi_cls_attributes)
 
+        # Initialize logger
+        from loguru import logger
+        from src.logger.base_logger import BaseLogger
+        BaseLogger.configure(self.settings.log_settings)
+        logger.info("Starting FastAPI app instance...")
+        logger.debug(f"Routers to include: {routers}")
+        logger.success("Logger initialized and log file created.")
+
         middleware_list = MiddlewareList()
         middleware_list.add(
             CORSMiddleware,
@@ -33,6 +43,12 @@ class BaseApp:
             allow_credentials=self.settings.IS_ALLOWED_CREDENTIALS,
             allow_methods=self.settings.ALLOWED_METHODS,
             allow_headers=self.settings.ALLOWED_HEADERS,
+        )
+        # Example: you can define custom exception handlers here
+        exception_handlers = {}  # Add custom exception handlers if needed
+        middleware_list.add(
+            ExceptionHandlerMiddleware,
+            exception_handlers=exception_handlers
         )
         # Add more middlewares as needed
         # TBD
