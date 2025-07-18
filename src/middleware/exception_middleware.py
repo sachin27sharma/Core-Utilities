@@ -2,6 +2,7 @@ from fastapi import Request, Response
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
+
 class ExceptionHandlerMiddleware(BaseHTTPMiddleware):
     def __init__(self, app, exception_handlers: dict):
         super().__init__(app)
@@ -18,4 +19,3 @@ class ExceptionHandlerMiddleware(BaseHTTPMiddleware):
                 return await handler(request, exc)
             # Default fallback
             return JSONResponse(status_code=500, content={"detail": str(exc)})
-

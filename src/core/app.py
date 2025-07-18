@@ -6,6 +6,7 @@ from src.core.events.server_events import execute_backend_server_event_handler, 
 from src.middleware.list_middleware import MiddlewareList
 from src.middleware.exception_middleware import ExceptionHandlerMiddleware
 from src.logger.base_logger import BaseLogger
+from src.middleware.timing_middleware import AuditTimingMiddleware
 
 
 class BaseApp:
@@ -21,21 +22,7 @@ class BaseApp:
         from src.config.settings import get_settings
         return get_settings(config_path)
 
-    def create_app(self, routers: Optional[List] = None):
-        """
-        Returns the FastAPI app instance with the base router and any additional routers included.
-        """
-        from src.api.base import router as base_router
-        app = FastAPI(**self.settings.get_fastapi_cls_attributes)
-
-        # Initialize logger
-        from loguru import logger
-        from src.logger.base_logger import BaseLogger
-        BaseLogger.configure(self.settings.log_settings)
-        logger.info("Starting FastAPI app instance...")
-        logger.debug(f"Routers to include: {routers}")
-        logger.success("Logger initialized and log file created.")
-
+    def setup_middlewares(self, app):
         middleware_list = MiddlewareList()
         middleware_list.add(
             CORSMiddleware,
@@ -44,17 +31,42 @@ class BaseApp:
             allow_methods=self.settings.ALLOWED_METHODS,
             allow_headers=self.settings.ALLOWED_HEADERS,
         )
-        # Example: you can define custom exception handlers here
         exception_handlers = {}  # Add custom exception handlers if needed
         middleware_list.add(
             ExceptionHandlerMiddleware,
             exception_handlers=exception_handlers
         )
+        middleware_list.add(
+            AuditTimingMiddleware
+        )
         # Add more middlewares as needed
         # TBD
-
-        # Apply all middlewares to the app
         middleware_list.apply(app)
+
+    def setup_logger(self, routers):
+        from loguru import logger
+        from src.logger.base_logger import BaseLogger
+        BaseLogger.configure(self.settings.log_settings)
+        logger.info("Starting FastAPI app instance...")
+        logger.debug(f"Routers to include: {routers}")
+        logger.success("Logger initialized and log file created.")
+
+    def include_routers(self, app, base_router, routers):
+        app.include_router(base_router, prefix=self.settings.app.api_prefix)
+        if routers:
+            for router in routers:
+                app.include_router(router, prefix=self.settings.app.api_prefix)
+
+    def create_app(self, routers: Optional[List] = None):
+        """
+        Returns the FastAPI app instance with the base router and any additional routers included.
+        """
+        from src.api.base import router as base_router
+        app = FastAPI(**self.settings.get_fastapi_cls_attributes)
+
+        self.setup_logger(routers)
+
+        self.setup_middlewares(app)
 
         app.add_event_handler(
             "startup",
@@ -65,11 +77,6 @@ class BaseApp:
             lambda: terminate_backend_server_event_handler(backend_app=app),
         )
 
-        # Always include the base router
-        app.include_router(base_router, prefix=self.settings.app.api_prefix)
-        # Include any additional routers passed in
-        if routers:
-            for router in routers:
-                app.include_router(router, prefix=self.settings.app.api_prefix)
+        self.include_routers(app, base_router, routers)
         return app
 
